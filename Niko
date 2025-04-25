@@ -1,0 +1,72 @@
+from flask import Flask, render_template_string, request, redirect, url_for
+
+app = Flask(__name__)
+
+# Simulated database for comments
+comments = []
+
+# Your HTML moved into a Python string
+HTML_TEMPLATE = """
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <meta charset='UTF-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <title>LuxBuild Estates</title>
+  <style>
+    body { font-family: 'Montserrat', sans-serif; background: #f4f1ed; margin: 0; padding: 0; }
+    header { background: #000; color: white; padding: 6rem 2rem; text-align: center; }
+    .btn { background: white; color: black; padding: 0.75rem 2rem; border: none; border-radius: 30px; }
+    section { padding: 4rem 2rem; }
+    .comment { background: #fff; padding: 1rem; margin: 1rem 0; border-left: 4px solid #000; }
+    form textarea, form input { width: 100%; margin: 0.5rem 0; padding: 0.75rem; }
+    form button { background: black; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 20px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>LuxBuild Estates</h1>
+    <p>Architectural Masterpieces for Visionary Investors</p>
+  </header>
+
+  <section>
+    <h2>Our Purpose</h2>
+    <p>Creating generational properties that embody refinement, exclusivity, and architectural innovation.</p>
+  </section>
+
+  <section>
+    <h2>Visitor Comments</h2>
+    <form method='POST'>
+      <input type='text' name='name' placeholder='Your Name' required>
+      <textarea name='comment' placeholder='Leave a comment...' required></textarea>
+      <button type='submit'>Post Comment</button>
+    </form>
+    <div>
+      {% for c in comments %}
+        <div class='comment'>
+          <strong>{{ c['name'] }}</strong>
+          <p>{{ c['comment'] }}</p>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <footer>
+    <h2>Let's Build Your Legacy</h2>
+  </footer>
+</body>
+</html>
+"""
+
+@app.route('/', methods=['GET', 'POST'])
+def home():
+    if request.method == 'POST':
+        name = request.form.get('name')
+        comment = request.form.get('comment')
+        if name and comment:
+            comments.append({'name': name, 'comment': comment})
+        return redirect(url_for('home'))
+    return render_template_string(HTML_TEMPLATE, comments=comments)
+
+if __name__ == '__main__':
+    app.run(debug=True)
